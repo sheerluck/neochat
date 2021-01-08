@@ -101,6 +101,7 @@ Kirigami.ApplicationWindow {
             Config.openRoom = room.id;
             Config.save();
             connectRoomToSignal(roomItem);
+            roomItem.updateRoomReadMarker();
             return roomItem;
         }
 

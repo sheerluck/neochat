@@ -28,6 +28,17 @@ Kirigami.ScrollablePage {
     signal switchRoomUp()
     signal switchRoomDown()
 
+    title: currentRoom.displayName
+
+    header: QQC2.Control {
+        visible: contentItem.visible
+        padding: Kirigami.Units.smallSpacing
+        contentItem: Kirigami.InlineMessage {
+            showCloseButton: true
+            visible: false
+        }
+    }
+
     Connections {
         target: roomManager.actionsHandler
         onShowMessage: {
@@ -39,16 +50,10 @@ Kirigami.ScrollablePage {
         onHideMessage: page.header.contentItem.visible = false
     }
 
-    header: QQC2.Control {
-        visible: contentItem.visible
-        padding: Kirigami.Units.smallSpacing
-        contentItem: Kirigami.InlineMessage {
-            showCloseButton: true
-            visible: false
-        }
+    function updateRoomReadMarker() {
+        messageListView.updateReadMarker();
     }
 
-    title: currentRoom.displayName
     titleDelegate: Component {
         RowLayout {
             visible: !Kirigami.Settings.isMobile
