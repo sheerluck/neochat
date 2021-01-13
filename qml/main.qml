@@ -66,10 +66,11 @@ Kirigami.ApplicationWindow {
             }
             QQC2.CheckBox {
                 id: checkWarning
-                text: i18n("Don't remember me again")
+                text: i18n("Don't ask me again")
             }
 
             RowLayout {
+                Layout.fillWidth: true
                 QQC2.Button {
                     Layout.alignment: Qt.AlignRight
                     text: i18nc("@action:button", "Ok")
