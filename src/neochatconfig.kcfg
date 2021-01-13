@@ -26,6 +26,10 @@
       <label>Show leave and join events in the timeline</label>
       <default>true</default>
     </entry>
+    <entry name="WarningOnClose" type="bool">
+      <label>Show warning on closing neochat</label>
+      <default>true</default>
+    </entry>
   </group>
   <group name="Timeline">
     <entry name="ShowAvatarInTimeline" type="bool">

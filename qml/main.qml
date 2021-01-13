@@ -35,7 +35,57 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    onClosing: Controller.saveWindowGeometry(root)
+    onVisibilityChanged: if (visible) { reallyClose = false }
+
+    property bool reallyClose: false
+
+    onClosing: {
+        Controller.saveWindowGeometry(root);
+        if (Config.warningOnClose && !Kirigami.Settings.isMobile && !reallyClose) {
+            close.accepted = false;
+            warningDialog.visible = true;
+        }
+    }
+
+    QQC2.ApplicationWindow {
+        id: warningDialog
+        flags: Qt.Dialog
+        visible: false
+        width: Kirigami.Units.gridUnit * 15
+        height: Kirigami.Units.gridUnit * 8
+        ColumnLayout {
+            anchors {
+                fill: parent
+                margins: Kirigami.Units.largeSpacing
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                id: warningLabel
+                wrapMode: QQC2.Label.Wrap
+                text: i18n("NeoChat will continue to run in the background and can be closed in the taskbar.")
+            }
+            QQC2.CheckBox {
+                id: checkWarning
+                text: i18n("Don't remember me again")
+            }
+
+            RowLayout {
+                QQC2.Button {
+                    Layout.alignment: Qt.AlignRight
+                    text: i18nc("@action:button", "Ok")
+                    onClicked: {
+                        if (checkWarning.checked) {
+                            Config.warningOnClose = false;
+                            Config.save();
+                        }
+                        root.reallyClose = true;
+                        root.close();
+                        warningDialog.close();
+                    }
+                }
+            }
+        }
+    }
 
     // This timer allows to batch update the window size change to reduce
     // the io load and also work around the fact that x/y/width/height are
