@@ -4,7 +4,7 @@
  *
  * SPDX-License-Identifier: GPL-3.0-only
  */
-import QtQuick 2.12
+import QtQuick 2.15
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
@@ -166,6 +166,7 @@ Kirigami.OverlayDrawer {
                 clip: true
                 headerPositioning: ListView.OverlayHeader
                 boundsBehavior: Flickable.DragOverBounds
+                reuseItems: true
 
                 header: Pane {
                     padding: Kirigami.Units.smallSpacing
