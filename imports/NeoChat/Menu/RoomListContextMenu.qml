@@ -12,12 +12,13 @@ import NeoChat.Page 1.0
  * Context menu when clicking on a room in the room list
  */
 Menu {
-    id: root
+    id: roomListContextMenu
+    
     property var room
 
     MenuItem {
         text: i18n("Open in new window")
-        onTriggered: roomManager.openWindow(room);
+        onTriggered: RoomManager.openWindow(room);
     }
 
     MenuSeparator {}

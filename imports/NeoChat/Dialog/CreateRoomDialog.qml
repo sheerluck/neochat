@@ -13,7 +13,7 @@ import NeoChat.Component 1.0
 import org.kde.neochat 1.0
 
 Kirigami.OverlaySheet {
-    id: root
+    id: createRoomDialog
 
     parent: applicationWindow().overlay
 
@@ -39,9 +39,9 @@ Kirigami.OverlaySheet {
 
             text: i18nc("@action:button", "Ok")
             onClicked: {
-                roomManager.actionsHandler.createRoom(roomNameField.text, roomTopicField.text);
-                root.close();
-                root.destroy();
+                RoomManager.actionsHandler.createRoom(roomNameField.text, roomTopicField.text);
+                createRoomDialog.close();
+                createRoomDialog.destroy();
             }
         }
     }

@@ -16,7 +16,7 @@ import NeoChat.Setting 1.0
 import org.kde.neochat 1.0
 
 Kirigami.ScrollablePage {
-    id: root
+    id: joinRoomPage
     property var connection
 
     property alias keyword: identifierField.text
@@ -49,7 +49,7 @@ Kirigami.ScrollablePage {
 
                 onClicked: {
                     if (!identifierField.isJoined) {
-                        roomManager.actionsHandler.joinRoom(identifierField.text);
+                        RoomManager.actionsHandler.joinRoom(identifierField.text);
                         // When joining the room, the room will be opened
                     }
                     applicationWindow().pageStack.layers.pop();
@@ -88,9 +88,9 @@ Kirigami.ScrollablePage {
         model: PublicRoomListModel {
             id: publicRoomListModel
 
-            connection: root.connection
-            server: root.server
-            keyword: root.keyword
+            connection: joinRoomPage.connection
+            server: joinRoomPage.server
+            keyword: joinRoomPage.keyword
         }
 
         onContentYChanged: {
@@ -102,10 +102,10 @@ Kirigami.ScrollablePage {
             width: publicRoomsListView.width
             onClicked: {
                 if (!isJoined) {
-                    roomManager.actionsHandler.joinRoom(connection, roomID)
+                    RoomManager.actionsHandler.joinRoom(connection, roomID)
                     justJoined = true;
                 } else {
-                    roomManager.enterRoom(connection.room(roomID))
+                    RoomManager.currentRoom = connection.room(roomID)
                 }
                 applicationWindow().pageStack.layers.pop();
             }

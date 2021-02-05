@@ -16,7 +16,7 @@ import NeoChat.Component 1.0
 import NeoChat.Menu 1.0
 
 Kirigami.ScrollablePage {
-    id: page
+    id: roomListPage
 
     property var enteredRoom
     required property var activeConnection
@@ -56,7 +56,7 @@ Kirigami.ScrollablePage {
             helpfulAction: Kirigami.Action {
                 icon.name: sortFilterRoomListModel.filterText.length > 0 ? "search" : "list-add"
                 text: sortFilterRoomListModel.filterText.length > 0 ? i18n("Search in room directory") : i18n("Explore rooms")
-                onTriggered: pageStack.layers.push("qrc:/imports/NeoChat/Page/JoinRoomPage.qml", {"connection": activeConnection, "keyword": sortFilterRoomListModel.filterText})
+                onTriggered: roomListPageStack.layers.push("qrc:/imports/NeoChat/Page/JoinRoomPage.qml", {"connection": activeConnection, "keyword": sortFilterRoomListModel.filterText})
             }
         }
         model:  SortFilterRoomListModel {
@@ -98,9 +98,7 @@ Kirigami.ScrollablePage {
             action: Kirigami.Action {
                 id: enterRoomAction
                 onTriggered: {
-                    var roomItem = roomManager.enterRoom(currentRoom)
-                    roomListItem.KeyNavigation.right = roomItem
-                    roomItem.focus = true;
+                    RoomManager.currentRoom = currentRoom
                 }
             }
 
@@ -142,7 +140,7 @@ Kirigami.ScrollablePage {
                         id: optionAction
                         icon.name: "configure"
                         onTriggered: {
-                            const menu = roomListContextMenu.createObject(page, {"room": currentRoom})
+                            const menu = roomListContextMenu.createObject(roomListPage, {"room": currentRoom})
                             configButton.visible = true
                             configButton.down = true
                             menu.closed.connect(function() {
@@ -169,8 +167,8 @@ Kirigami.ScrollablePage {
             model: AccountListModel { }
             delegate: QQC2.TabButton {
                 checkable: true
-                checked: Controller.activeConnection.user.id === model.connection.user.id
-                onClicked: Controller.activeConnection = model.connection
+                checked: roomListPage.activeConnection.user.id === model.connection.user.id
+                onClicked: roomListPage.activeConnection = model.connection
                 Layout.fillWidth: true
                 text: model.user.id
             }

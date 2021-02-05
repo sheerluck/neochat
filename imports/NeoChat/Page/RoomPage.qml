@@ -21,33 +21,38 @@ import NeoChat.Dialog 1.0
 import NeoChat.Menu.Timeline 1.0
 
 Kirigami.ScrollablePage {
-    id: page
+    id: roomPage
 
     required property var currentRoom
+    required property var actionsHandler
 
     title: currentRoom.displayName
-
-    signal switchRoomUp()
-    signal switchRoomDown()
 
     Connections {
         target: Controller.activeConnection
         function onJoinedRoom(room) {
             if(room.id === invitation.id) {
-                roomManager.enterRoom(room);
+                RoomManager.currentRoom = room;
             }
         }
     }
 
     Connections {
-        target: roomManager.actionsHandler
+        target: roomPage.actionsHandler
         onShowMessage: {
-            page.header.contentItem.text = message;
-            page.header.contentItem.type = messageType === ActionsHandler.Error ? Kirigami.MessageType.Error : Kirigami.MessageType.Information;
-            page.header.contentItem.visible = true;
+            roomPage.header.contentItem.text = message;
+            roomPage.header.contentItem.type = messageType === ActionsHandler.Error ? Kirigami.MessageType.Error : Kirigami.MessageType.Information;
+            roomPage.header.contentItem.visible = true;
         }
 
-        onHideMessage: page.header.contentItem.visible = false
+        onHideMessage: roomPage.header.contentItem.visible = false
+    }
+    
+    Connections {
+        target: RoomManager
+        function onShowEvent(event) {
+            roomPage.goToEvent(event)            
+        }
     }
 
     header: QQC2.Control {
@@ -74,8 +79,8 @@ Kirigami.ScrollablePage {
                 text: i18n("Reject")
 
                 onClicked: {
-                    page.currentRoom.forget()
-                    roomManager.getBack();
+                    roomPage.currentRoom.forget()
+                    RoomManager.currentRoom = undefined
                 }
             }
 
@@ -104,21 +109,21 @@ Kirigami.ScrollablePage {
 
     Keys.onTabPressed: {
         if (event.modifiers & Qt.ControlModifier) {
-            switchRoomDown();
+            RoomManager.goToNextRoom()
         }
     }
 
     Keys.onBacktabPressed: {
         if (event.modifiers & Qt.ControlModifier) {
-            switchRoomUp();
+            RoomManager.goToPreviousRoom()
         }
     }
 
     Keys.onPressed: {
         if (event.key === Qt.Key_PageDown && (event.modifiers & Qt.ControlModifier)) {
-            switchRoomUp();
+            RoomManager.goToPreviousRoom();
         } else if (event.key === Qt.Key_PageUp && (event.modifiers & Qt.ControlModifier)) {
-            switchRoomDown();
+            RoomManager.goToNextRoom();
         } else if (!(event.modifiers & Qt.ControlModifier) && event.key < Qt.Key_Escape) {
             event.accepted = true;
             chatTextInput.addText(event.text);
@@ -134,7 +139,7 @@ Kirigami.ScrollablePage {
 
         readonly property int largestVisibleIndex: count > 0 ? indexAt(contentX + (width / 2), contentY + height - 1) : -1
         readonly property bool noNeedMoreContent: !currentRoom || currentRoom.eventsHistoryJob || currentRoom.allHistoryLoaded
-        readonly property bool isLoaded: page.width * page.height > 10
+        readonly property bool isLoaded: roomPage.width * roomPage.height > 10
 
         spacing: Kirigami.Units.smallSpacing
         clip: true
@@ -589,8 +594,9 @@ Kirigami.ScrollablePage {
     }
 
     footer: ChatTextInput {
-        id: chatTextInput
+        //id: chatTextInput
 
+        currentRoom: roomPage.currentRoom
         visible: !invitation.visible && !(messageListView.count === 0 && !currentRoom.allHistoryLoaded)
         Layout.fillWidth: true
     }
@@ -631,13 +637,13 @@ Kirigami.ScrollablePage {
     }
 
     function openMessageContext(author, message, eventId, toolTip, model) {
-        const contextMenu = messageDelegateContextMenu.createObject(page, {
+        const contextMenu = messageDelegateContextMenu.createObject(roomPage, {
             'author': author,
             'message': message,
             'eventId': eventId,
         });
         contextMenu.viewSource.connect(function() {
-            messageSourceSheet.createObject(page, {
+            messageSourceSheet.createObject(roomPage, {
                 'sourceText': toolTip,
             }).open();
             contextMenu.close();

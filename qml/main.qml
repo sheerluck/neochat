@@ -37,6 +37,14 @@ Kirigami.ApplicationWindow {
             Qt.quit()
         }
     }
+    
+    Connections {
+        target: RoomManager
+        function onOpenWindow(room) {
+            const secondaryWindow = roomWindow.createObject(applicationWindow(), {currentRoom: room});
+            secondaryWindow.show();
+        }
+    }
 
     // This timer allows to batch update the window size change to reduce
     // the io load and also work around the fact that x/y/width/height are
@@ -52,89 +60,6 @@ Kirigami.ApplicationWindow {
     onHeightChanged: saveWindowGeometryTimer.restart()
     onXChanged: saveWindowGeometryTimer.restart()
     onYChanged: saveWindowGeometryTimer.restart()
-
-    /**
-     * Manage opening and close rooms
-     * TODO this should probably be moved to C++
-     */
-    QtObject {
-        id: roomManager
-
-        property var actionsHandler: ActionsHandler {
-            room: roomManager.currentRoom
-            connection: Controller.activeConnection
-            onRoomJoined: {
-                roomManager.enterRoom(Controller.activeConnection.room(roomName))
-            }
-        }
-
-        property var currentRoom: null
-        property alias pageStack: root.pageStack
-        property var roomList: null
-        property Item roomItem: null
-
-        readonly property bool hasOpenRoom: currentRoom !== null
-
-        signal leaveRoom(string room);
-        signal openRoom(string room);
-
-        function roomByAliasOrId(aliasOrId) {
-            return Controller.activeConnection.room(aliasOrId)
-        }
-
-        function openRoomAndEvent(room, event) {
-            enterRoom(room)
-            roomItem.goToEvent(event)
-        }
-
-        function loadInitialRoom() {
-            if (Config.openRoom) {
-                const room = Controller.activeConnection.room(Config.openRoom);
-                currentRoom = room;
-                roomItem = pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", { 'currentRoom': room, });
-                connectRoomToSignal(roomItem);
-            } else {
-                // TODO create welcome page
-            }
-        }
-
-        function enterRoom(room) {
-            if (currentRoom != null) {
-                roomItem.currentRoom = room;
-                pageStack.currentIndex = pageStack.depth - 1;
-            } else {
-                roomItem = pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", { 'currentRoom': room, });
-            }
-            currentRoom = room;
-            Config.openRoom = room.id;
-            Config.save();
-            connectRoomToSignal(roomItem);
-            return roomItem;
-        }
-
-        function getBack() {
-            pageStack.replace("qrc:/imports/NeoChat/Page/RoomPage.qml", { 'currentRoom': currentRoom, });
-        }
-
-        function openWindow(room) {
-            const secondayWindow = roomWindow.createObject(applicationWindow(), {currentRoom: room});
-            secondayWindow.width = root.width - roomList.width;
-            secondayWindow.show();
-        }
-
-        function connectRoomToSignal(item) {
-            if (!roomList) {
-                console.log("Should not happen: no room list page but room page");
-            }
-            item.switchRoomUp.connect(function() {
-                roomList.goToNextRoom();
-            });
-
-            item.switchRoomDown.connect(function() {
-                roomList.goToPreviousRoom();
-            });
-        }
-    }
 
     function pushReplaceLayer(page, args) {
         if (pageStack.layers.depth === 2) {
@@ -157,8 +82,8 @@ Kirigami.ApplicationWindow {
         modal: !root.wideScreen || !enabled
         onEnabledChanged: drawerOpen = enabled && !modal
         onModalChanged: drawerOpen = !modal
-        enabled: roomManager.hasOpenRoom && pageStack.layers.depth < 2 && pageStack.depth < 3
-        room: roomManager.currentRoom
+        enabled: RoomManager.hasOpenRoom && pageStack.layers.depth < 2 && pageStack.depth < 3
+        room: RoomManager.currentRoom
         handleVisible: enabled && pageStack.layers.depth < 2 && pageStack.depth < 3
     }
 
@@ -261,20 +186,23 @@ Kirigami.ApplicationWindow {
             if (Controller.accountCount === 0) {
                 pageStack.replace("qrc:/imports/NeoChat/Page/WelcomePage.qml", {});
             } else {
-                roomManager.roomList = pageStack.replace(roomListComponent, {'activeConnection': Controller.activeConnection});
-                roomManager.loadInitialRoom();
+                pageStack.replace(roomListComponent, {'activeConnection': Controller.activeConnection});
             }
         }
 
-        function onBusyChanged() {
-            if(!Controller.busy && roomManager.roomList === null) {
-                roomManager.roomList = pageStack.replace(roomListComponent);
+
+        function onConnectionAdded() {
+            if (Controller.accountCount === 1) {
+                if (Controller.busy) {
+                    pageStack.replace("qrc:/imports/NeoChat/Page/LoadingPage.qml");
+                } else {
+                    pageStack.replace(roomListComponent);
+                }
             }
         }
 
         function onRoomJoined(roomId) {
-            const room = Controller.activeConnection.room(roomId);
-            return roomManager.enterRoom(room);
+            RoomManager.currentRoom = Controller.activeConnection.room(roomId);
         }
 
         function onConnectionDropped() {
@@ -293,7 +221,7 @@ Kirigami.ApplicationWindow {
         }
 
         function onOpenRoom(room) {
-            roomManager.enterRoom(room)
+            RoomManager.currentRoom = room
         }
 
         function onUserConsentRequired(url) {
@@ -305,7 +233,7 @@ Kirigami.ApplicationWindow {
     Connections {
         target: Controller.activeConnection
         onDirectChatAvailable: {
-            roomManager.enterRoom(Controller.activeConnection.room(directChat.id));
+            RoomManager.currentRoom = Controller.activeConnection.room(directChat.id)
         }
     }
 
@@ -351,13 +279,9 @@ Kirigami.ApplicationWindow {
                     if(!result) {
                         return
                     }
-                    if(result[1] == currentRoom.id) {
-                        roomManager.roomItem.goToEvent(result[2])
-                    } else {
-                        roomManager.openRoomAndEvent(roomManager.roomByAliasOrId(result[1]), result[2])
-                    }
+                    RoomManager.openRoomAndEvent(Controller.activeConnection.room(result[1]), result[2])
                 } else {
-                    roomManager.enterRoom(roomManager.roomByAliasOrId(content))
+                    RoomManager.currentRoom = Controller.activeConnection.room(content)
                 }
             } else if(content.match("^@")) {
                 let dialog = userDialog.createObject(root.overlay, {room: currentRoom, user: currentRoom.user(content)})

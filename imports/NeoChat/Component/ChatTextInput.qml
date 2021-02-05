@@ -18,6 +18,8 @@ import org.kde.neochat 1.0
 
 ToolBar {
     id: root
+    
+    required property currentRoom
 
     property alias isReply: replyItem.visible
     property bool isReaction: false
@@ -475,7 +477,7 @@ ToolBar {
                     property var userAutocompleted: ({})
 
                     function postMessage() {
-                        roomManager.actionsHandler.postMessage(inputField.text.trim(), attachmentPath,
+                        root.currentPage.actionsHandler.postMessage(inputField.text.trim(), attachmentPath,
                             replyEventID, editEventId, inputField.userAutocompleted);
                         clearAttachment();
                         currentRoom.markAllMessagesAsRead();

@@ -21,6 +21,7 @@ add_executable(neochat
     devicesmodel.cpp
     filetypesingleton.cpp
     login.cpp
+    roommanager.cpp
     ../res.qrc
 )
 
