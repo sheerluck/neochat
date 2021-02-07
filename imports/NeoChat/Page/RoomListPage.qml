@@ -38,7 +38,11 @@ Kirigami.ScrollablePage {
     Connections {
         target: RoomManager
         function onHasOpenRoomChanged() {
-            pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", {"currentRoom": RoomManager.currentRoom, "actionsHandler": RoomManager.actionsHandler})
+            console.log("FOO")
+            if(RoomManager.hasOpenRoom) {
+                console.log("BAR")
+                pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", {"currentRoom": RoomManager.currentRoom, "actionsHandler": RoomManager.actionsHandler})
+            }
         }
     }
 

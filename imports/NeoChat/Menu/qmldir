@@ -1,2 +1,3 @@
 module NeoChat.Menu
 RoomListContextMenu 1.0 RoomListContextMenu.qml
+GlobalDrawer 1.0 GlobalDrawer.qml

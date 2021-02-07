@@ -33,21 +33,21 @@ RoomManager::RoomManager()
 
 void RoomManager::setCurrentRoom(NeoChatRoom* currentRoom)
 {
+    qDebug() << currentRoom;
     KConfig config("neochatrc");
     KConfigGroup initialRoomsGroup(&config, "initialRooms");
 
+    bool _hasOpenRoom = hasOpenRoom();
+
     if(!currentRoom) {
         m_currentRoom = std::nullopt;
-        Q_EMIT hasOpenRoomChanged();
-        Q_EMIT currentRoomChanged();
         initialRoomsGroup.deleteEntry(Controller::instance().activeConnection()->userId());
-        return;
+    } else {
+        m_currentRoom = currentRoom;
+        Q_EMIT currentRoomChanged();
     }
-
-    bool _hasOpenRoom = hasOpenRoom();
-    m_currentRoom = currentRoom;
-    Q_EMIT currentRoomChanged();
-    if(!_hasOpenRoom != hasOpenRoom()) {
+    if(_hasOpenRoom != hasOpenRoom()) {
+        qDebug() << "CHANGED";
         Q_EMIT hasOpenRoomChanged();        
     }
     
@@ -75,3 +75,12 @@ void RoomManager::openRoomAndEvent(NeoChatRoom *room, const QString &event)
     setCurrentRoom(room);
     Q_EMIT showEvent(event);
 }
+
+void RoomManager::resetCurrentRoom()
+{
+    if(hasOpenRoom()) {
+        m_currentRoom = std::nullopt;
+        Q_EMIT hasOpenRoomChanged();
+    }
+}
+

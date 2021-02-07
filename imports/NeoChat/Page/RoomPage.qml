@@ -91,7 +91,6 @@ Kirigami.ScrollablePage {
                 onClicked: {
                     currentRoom.acceptInvitation();
                     invitation.id = currentRoom.id
-                    currentRoom = null
                 }
             }
         }

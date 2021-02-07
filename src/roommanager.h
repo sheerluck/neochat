@@ -17,7 +17,7 @@ class RoomManager : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(NeoChatRoom *currentRoom READ currentRoom WRITE setCurrentRoom NOTIFY currentRoomChanged)
+    Q_PROPERTY(NeoChatRoom *currentRoom READ currentRoom WRITE setCurrentRoom RESET resetCurrentRoom NOTIFY currentRoomChanged)
     Q_PROPERTY(bool hasOpenRoom READ hasOpenRoom NOTIFY hasOpenRoomChanged)
     Q_PROPERTY(ActionsHandler *actionsHandler READ actionsHandler CONSTANT)
 
@@ -31,6 +31,8 @@ public:
     void setCurrentRoom(NeoChatRoom *currentRoom);
 
     bool hasOpenRoom() const;
+    
+    void resetCurrentRoom();
 
     ActionsHandler *actionsHandler() const;
     
