@@ -17,9 +17,10 @@ import NeoChat.Page 1.0
 import org.kde.neochat 1.0
 
 ToolBar {
-    id: root
+    id: chatTextInput
     
     required property var currentRoom
+    required property var actionsHandler
 
     property alias isReply: replyItem.visible
     property bool isReaction: false
@@ -52,7 +53,7 @@ ToolBar {
         shortcut: StandardKey.Paste
         onTriggered: {
             if (Clipboard.hasImage) {
-                root.pasteImage();
+                chatTextInput.pasteImage();
             }
             activeFocusItem.paste();
         }
@@ -402,7 +403,7 @@ ToolBar {
                         } else if (event.key === Qt.Key_PageUp) {
                             switchRoomUp();
                         } else if (event.key === Qt.Key_V && event.modifiers & Qt.ControlModifier) {
-                            root.pasteImage();
+                            chatTextInput.pasteImage();
                         }
                     }
 
@@ -477,7 +478,7 @@ ToolBar {
                     property var userAutocompleted: ({})
 
                     function postMessage() {
-                        root.currentPage.actionsHandler.postMessage(inputField.text.trim(), attachmentPath,
+                        chatTextInput.actionsHandler.postMessage(inputField.text.trim(), attachmentPath,
                             replyEventID, editEventId, inputField.userAutocompleted);
                         clearAttachment();
                         currentRoom.markAllMessagesAsRead();
@@ -528,7 +529,7 @@ ToolBar {
                         fileDialog.chosen.connect(function(path) {
                             if (!path) return
 
-                            root.attach(path)
+                            chatTextInput.attach(path)
                         })
 
                         fileDialog.open()
@@ -555,8 +556,8 @@ ToolBar {
                 onClicked: {
                     inputField.postMessage()
                     inputField.text = ""
-                    root.clearEditReply()
-                    root.closeAll()
+                    chatTextInput.clearEditReply()
+                    chatTextInput.closeAll()
                 }
 
                 ToolTip {
@@ -606,7 +607,7 @@ ToolBar {
 
     function edit(editContent, editEventId) {
         inputField.text = editContent;
-        root.editEventId = editEventId
+        chatTextInput.editEventId = editEventId
     }
 
     function closeAll() {
@@ -630,6 +631,6 @@ ToolBar {
         if (!Clipboard.saveImage(localPath)) {
             return;
         }
-        root.attach(localPath);
+        chatTextInput.attach(localPath);
     }
 }

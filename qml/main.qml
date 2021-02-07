@@ -162,19 +162,7 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Component {
-        id: roomListComponent
-        RoomListPage {
-            id: roomList
-            activeConnection: Controller.activeConnection
-        }
-    }
-    Connections {
-        target: LoginHelper
-        function onInitialSyncFinished() {
-            roomManager.roomList = pageStack.replace(roomListComponent);
-        }
-    }
+    pageStack.initialPage: LoadingPage {}
 
     Connections {
         target: Controller
@@ -186,7 +174,7 @@ Kirigami.ApplicationWindow {
             if (Controller.accountCount === 0) {
                 pageStack.replace("qrc:/imports/NeoChat/Page/WelcomePage.qml", {});
             } else {
-                pageStack.replace(roomListComponent, {'activeConnection': Controller.activeConnection});
+                pageStack.replace("qrc:/imports/NeoChat/Page/RoomListPage.qml", {'activeConnection': Controller.activeConnection});
             }
         }
 

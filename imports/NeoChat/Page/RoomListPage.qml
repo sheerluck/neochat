@@ -35,6 +35,13 @@ Kirigami.ScrollablePage {
         listView.currentItem.action.trigger();
     }
 
+    Connections {
+        target: RoomManager
+        function onHasOpenRoomChanged() {
+            pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", {"currentRoom": RoomManager.currentRoom, "actionsHandler": RoomManager.actionsHandler})
+        }
+    }
+
     title: i18n("Rooms")
 
     titleDelegate: Kirigami.SearchField {
@@ -63,7 +70,7 @@ Kirigami.ScrollablePage {
             id: sortFilterRoomListModel
             sourceModel: RoomListModel {
                 id: roomListModel
-                connection: page.activeConnection
+                connection: roomListPage.activeConnection
             }
             roomSortOrder: Config.mergeRoomList ? SortFilterRoomListModel.LastActivity : SortFilterRoomListModel.Categories
         }

@@ -597,6 +597,7 @@ Kirigami.ScrollablePage {
         //id: chatTextInput
 
         currentRoom: roomPage.currentRoom
+        actionsHandler: roomPage.actionsHandler
         visible: !invitation.visible && !(messageListView.count === 0 && !currentRoom.allHistoryLoaded)
         Layout.fillWidth: true
     }
