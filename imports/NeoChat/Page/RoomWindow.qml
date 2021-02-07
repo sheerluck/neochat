@@ -9,6 +9,8 @@ import QtQuick.Window 2.2
 import QtQuick.Layouts 1.12
 import org.kde.kirigami 2.14 as Kirigami
 
+import org.kde.neochat 1.0
+
 Kirigami.ApplicationWindow {
     id: window
 

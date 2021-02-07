@@ -19,7 +19,7 @@ import org.kde.neochat 1.0
 ToolBar {
     id: root
     
-    required property currentRoom
+    required property var currentRoom
 
     property alias isReply: replyItem.visible
     property bool isReaction: false
