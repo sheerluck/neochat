@@ -88,8 +88,6 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    pageStack.initialPage: LoadingPage {}
-
     Connections {
         target: Controller
 
