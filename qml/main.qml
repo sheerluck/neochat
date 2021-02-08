@@ -87,6 +87,21 @@ Kirigami.ApplicationWindow {
             aboutData: Controller.aboutData
         }
     }
+    
+    Component {
+        id: roomListComponent
+        RoomListPage {
+            activeConnection: Controller.activeConnection
+        }
+    }
+    
+    Component {
+        id: roomComponent
+        RoomPage {
+            currentRoom: RoomManager.currentRoom
+            actionsHandler: RoomManager.actionsHandler
+        }
+    }
 
     Connections {
         target: Controller
@@ -95,7 +110,10 @@ Kirigami.ApplicationWindow {
             if (Controller.accountCount === 0) {
                 pageStack.replace("qrc:/imports/NeoChat/Page/WelcomePage.qml", {});
             } else {
-                pageStack.replace("qrc:/imports/NeoChat/Page/RoomListPage.qml", {'activeConnection': Controller.activeConnection});
+                pageStack.replace(roomListComponent);
+                if(RoomManager.hasOpenRoom) {
+                    pageStack.push(roomComponent);
+                }
             }
         }
 
