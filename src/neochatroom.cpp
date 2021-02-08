@@ -75,12 +75,6 @@ NeoChatRoom::NeoChatRoom(Connection *connection, QString roomId, JoinState joinS
     connect(this, &Room::aboutToAddHistoricalMessages, this, &NeoChatRoom::readMarkerLoadedChanged);
 
     connect(this, &Quotient::Room::eventsHistoryJobChanged, this, &NeoChatRoom::lastActiveTimeChanged);
-
-    connect(this, &Room::joinStateChanged, this, [=](JoinState oldState, JoinState newState) {
-        if(oldState == JoinState::Invite && newState != JoinState::Invite) {
-            Q_EMIT isInviteChanged();
-        }
-    });
 }
 
 void NeoChatRoom::uploadFile(const QUrl &url, const QString &body)

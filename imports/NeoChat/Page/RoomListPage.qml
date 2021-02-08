@@ -18,8 +18,9 @@ import NeoChat.Menu 1.0
 Kirigami.ScrollablePage {
     id: roomListPage
 
-    property var enteredRoom
     required property var activeConnection
+    
+    title: i18n("Rooms")
 
     function goToNextRoom() {
         do {
@@ -38,15 +39,11 @@ Kirigami.ScrollablePage {
     Connections {
         target: RoomManager
         function onHasOpenRoomChanged() {
-            console.log("FOO")
             if(RoomManager.hasOpenRoom) {
-                console.log("BAR")
                 pageStack.push("qrc:/imports/NeoChat/Page/RoomPage.qml", {"currentRoom": RoomManager.currentRoom, "actionsHandler": RoomManager.actionsHandler})
             }
         }
     }
-
-    title: i18n("Rooms")
 
     titleDelegate: Kirigami.SearchField {
         Layout.topMargin: Kirigami.Units.smallSpacing

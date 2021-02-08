@@ -33,7 +33,6 @@ RoomManager::RoomManager()
 
 void RoomManager::setCurrentRoom(NeoChatRoom* currentRoom)
 {
-    qDebug() << currentRoom;
     KConfig config("neochatrc");
     KConfigGroup initialRoomsGroup(&config, "initialRooms");
 
@@ -45,14 +44,15 @@ void RoomManager::setCurrentRoom(NeoChatRoom* currentRoom)
     } else {
         m_currentRoom = currentRoom;
         Q_EMIT currentRoomChanged();
+        initialRoomsGroup.writeEntry(Controller::instance().activeConnection()->userId(), currentRoom->id());
+        qDebug() << "!" << currentRoom->displayName();
     }
     if(_hasOpenRoom != hasOpenRoom()) {
-        qDebug() << "CHANGED";
         Q_EMIT hasOpenRoomChanged();        
     }
     
     m_actionsHandler->setRoom(currentRoom);
-    initialRoomsGroup.writeEntry(Controller::instance().activeConnection()->userId(), currentRoom->id());
+    
 }
 
 NeoChatRoom *RoomManager::currentRoom() const

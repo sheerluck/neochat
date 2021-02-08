@@ -23,10 +23,11 @@ import NeoChat.Menu.Timeline 1.0
 Kirigami.ScrollablePage {
     id: roomPage
 
-    required property var currentRoom
-    required property var actionsHandler
-
+    property var currentRoom
+    property var actionsHandler
     title: currentRoom.displayName
+
+    focus: true
 
     Connections {
         target: Controller.activeConnection
@@ -91,6 +92,7 @@ Kirigami.ScrollablePage {
                 onClicked: {
                     currentRoom.acceptInvitation();
                     invitation.id = currentRoom.id
+                    currentRoom = null
                 }
             }
         }
@@ -103,8 +105,6 @@ Kirigami.ScrollablePage {
             running: true
         }
     }
-
-    focus: true
 
     Keys.onTabPressed: {
         if (event.modifiers & Qt.ControlModifier) {
@@ -235,39 +235,6 @@ Kirigami.ScrollablePage {
 
             sourceModel: messageEventModel
         }
-
-        //        populate: Transition {
-        //            NumberAnimation {
-        //                property: "opacity"; from: 0; to: 1
-        //                duration: 200
-        //            }
-        //        }
-
-        //        add: Transition {
-        //            NumberAnimation {
-        //                property: "opacity"; from: 0; to: 1
-        //                duration: 200
-        //            }
-        //        }
-
-        //        move: Transition {
-        //            NumberAnimation {
-        //                property: "y"; duration: 200
-        //            }
-        //            NumberAnimation {
-        //                property: "opacity"; to: 1
-        //            }
-        //        }
-
-        //        displaced: Transition {
-        //            NumberAnimation {
-        //                property: "y"; duration: 200
-        //                easing.type: Easing.OutQuad
-        //            }
-        //            NumberAnimation {
-        //                property: "opacity"; to: 1
-        //            }
-        //        }
 
         delegate: DelegateChooser {
             id: timelineDelegateChooser
