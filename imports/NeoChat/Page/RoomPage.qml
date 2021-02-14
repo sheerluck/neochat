@@ -100,7 +100,7 @@ Kirigami.ScrollablePage {
 
     Kirigami.PlaceholderMessage {
         anchors.centerIn: parent
-        visible: page.currentRoom === null || (messageListView.count === 0 && !page.currentRoom.allHistoryLoaded && !page.currentRoom.isInvite)
+        visible: roomPage.currentRoom === null || (messageListView.count === 0 && !roomPage.currentRoom.allHistoryLoaded && !roomPage.currentRoom.isInvite)
         QQC2.BusyIndicator {
             running: true
         }
