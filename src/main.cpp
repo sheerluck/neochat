@@ -48,6 +48,7 @@
 #include "userlistmodel.h"
 #include "actionshandler.h"
 #include "chatboxhelper.h"
+#include "calldevices.h"
 
 using namespace Quotient;
 
@@ -111,12 +112,15 @@ int main(int argc, char *argv[])
     Login *login = new Login();
     ChatBoxHelper chatBoxHelper;
 
+    CallDevices::instance();
+
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "Controller", &Controller::instance());
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "Clipboard", &clipboard);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "Config", config);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "FileType", &fileTypeSingleton);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "LoginHelper", login);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "ChatBoxHelper", &chatBoxHelper);
+    qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "CallDevices", &CallDevices::instance());
     qmlRegisterType<AccountListModel>("org.kde.neochat", 1, 0, "AccountListModel");
     qmlRegisterType<ActionsHandler>("org.kde.neochat", 1, 0, "ActionsHandler");
     qmlRegisterType<ChatDocumentHandler>("org.kde.neochat", 1, 0, "ChatDocumentHandler");
