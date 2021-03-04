@@ -49,6 +49,7 @@
 #include "actionshandler.h"
 #include "chatboxhelper.h"
 #include "calldevices.h"
+#include "callmanager.h"
 
 using namespace Quotient;
 
@@ -121,6 +122,7 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "LoginHelper", login);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "ChatBoxHelper", &chatBoxHelper);
     qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "CallDevices", &CallDevices::instance());
+    qmlRegisterSingletonInstance("org.kde.neochat", 1, 0, "CallManager", &CallManager::instance());
     qmlRegisterType<AccountListModel>("org.kde.neochat", 1, 0, "AccountListModel");
     qmlRegisterType<ActionsHandler>("org.kde.neochat", 1, 0, "ActionsHandler");
     qmlRegisterType<ChatDocumentHandler>("org.kde.neochat", 1, 0, "ChatDocumentHandler");
@@ -141,6 +143,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<RoomMessageEvent>("org.kde.neochat", 1, 0, "RoomMessageEvent", "ENUM");
     qmlRegisterUncreatableType<RoomType>("org.kde.neochat", 1, 0, "RoomType", "ENUM");
     qmlRegisterUncreatableType<UserType>("org.kde.neochat", 1, 0, "UserType", "ENUM");
+    qmlRegisterUncreatableType<CallSession>("org.kde.neochat", 1, 0, "CallSession", "ENUM");
 
     qRegisterMetaType<User *>("User*");
     qRegisterMetaType<User *>("const User*");

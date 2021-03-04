@@ -25,6 +25,7 @@ add_executable(neochat
     chatboxhelper.cpp
     callmanager.cpp
     calldevices.cpp
+    callsession.cpp
     ../res.qrc
 )
 

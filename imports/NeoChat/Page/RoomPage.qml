@@ -40,6 +40,14 @@ Kirigami.ScrollablePage {
         }
     }
 
+    actions.main: Kirigami.Action {
+        text: i18n("Call")
+        icon.name: "call-start"
+        onTriggered: {
+            CallManager.startCall(page.currentRoom)
+        }
+    }
+
     Connections {
         target: roomManager.actionsHandler
         onShowMessage: {

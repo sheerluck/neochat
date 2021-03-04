@@ -34,6 +34,7 @@
 #include "notificationsmanager.h"
 #include "user.h"
 #include "utils.h"
+#include "callmanager.h"
 
 #include <KLocalizedString>
 
@@ -81,6 +82,10 @@ NeoChatRoom::NeoChatRoom(Connection *connection, QString roomId, JoinState joinS
         if(oldState == JoinState::Invite && newState != JoinState::Invite) {
             Q_EMIT isInviteChanged();
         }
+    });
+
+    connect(this, &Room::callEvent, this, [=](Room* room, const RoomEvent* event){
+        CallManager::instance().handleCallEvent(static_cast<NeoChatRoom *>(room), event);
     });
 }
 
