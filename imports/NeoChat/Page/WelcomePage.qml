@@ -46,6 +46,7 @@ Kirigami.ScrollablePage {
             source: "org.kde.neochat"
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 16
+            visible: module.item.headerVisible ?? true
         }
         Controls.Label {
             Layout.fillWidth: true
@@ -57,7 +58,7 @@ Kirigami.ScrollablePage {
         Loader {
             id: module
             Layout.alignment: Qt.AlignHCenter
-            source: "qrc:/imports/NeoChat/Component/Login/Login.qml"
+            source: "qrc:/imports/NeoChat/Component/Login/LoginRegister.qml"
             onSourceChanged: {
                 headerMessage.visible = false
                 headerMessage.text = ""

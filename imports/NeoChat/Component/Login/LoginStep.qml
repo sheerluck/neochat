@@ -15,6 +15,7 @@ ColumnLayout {
     property bool showBackButton: false
     property bool acceptable: false
     property string previousUrl: ""
+    property bool headerVisible: true
 
     /// Process this module, this is called by the continue button.
     /// Should call \sa processed when it finish successfully.
