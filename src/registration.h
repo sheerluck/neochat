@@ -28,8 +28,9 @@ class Registration : public QObject
     Q_PROPERTY(bool homeserverAvailable READ homeserverAvailable NOTIFY homeserverAvailableChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
-    Q_PROPERTY(bool usernameAvailable READ usernameAvailable NOTIFY usernameAvailableChanged);
-    Q_PROPERTY(bool testingUsername READ testingUsername NOTIFY testingUsernameChanged);
+    Q_PROPERTY(bool usernameAvailable READ usernameAvailable NOTIFY usernameAvailableChanged)
+    Q_PROPERTY(bool testingUsername READ testingUsername NOTIFY testingUsernameChanged)
+    Q_PROPERTY(QVector<QVector<QString>> flows READ flows NOTIFY flowsChanged)
 
 public:
 
@@ -40,7 +41,6 @@ public:
     }
 
     Q_INVOKABLE void registerAccount(const QString &homeserver, const QString &username, const QString &email, const QString &password);
-    Q_INVOKABLE QVector<QVector<QString>> flows() const;
 
     void setRecaptchaSiteKey(const QString &recaptchaSiteKey);
     QString recaptchaSiteKey() const;
@@ -72,6 +72,8 @@ public:
     void setTestingUsername(bool testing);
     bool testingUsername() const;
 
+    QVector<QVector<QString>> flows() const;
+
 Q_SIGNALS:
     void recaptchaSiteKeyChanged();
     void recaptchaResponseChanged();
@@ -83,6 +85,7 @@ Q_SIGNALS:
     void usernameChanged();
     void usernameAvailableChanged();
     void testingUsernameChanged();
+    void flowsChanged();
 
 private:
     QString m_recaptchaSiteKey = "6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb";
@@ -97,10 +100,13 @@ private:
     bool m_usernameAvailable = false;
     bool m_testingUsername = false;
 
+    QVector<QVector<QString>> m_flows;
+
     Quotient::Connection *m_connection = nullptr;
 
     void testHomeserver();
     void testUsername();
+    void loadFlows();
 
     Registration();
 };

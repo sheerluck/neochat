@@ -30,6 +30,7 @@ Registration::Registration()
 
     connect(this, &Registration::homeserverChanged, this, &Registration::testHomeserver);
     connect(this, &Registration::usernameChanged, this, &Registration::testUsername);
+    connect(this, &Registration::usernameAvailableChanged, this, &Registration::loadFlows);
 }
 
 void Registration::setRecaptchaResponse(const QString &recaptchaResponse)
@@ -52,11 +53,6 @@ void Registration::setRecaptchaSiteKey(const QString &recaptchaSiteKey)
 QString Registration::recaptchaSiteKey() const
 {
     return m_recaptchaSiteKey;
-}
-
-QVector<QVector<QString>> Registration::flows() const
-{
-    return QVector<QVector<QString>>();
 }
 
 void Registration::registerAccount(const QString &homeserver, const QString &username, const QString &email, const QString &password)
@@ -133,11 +129,10 @@ void Registration::testHomeserver()
     m_connection->resolveServer(QStringLiteral("@user:") + m_homeserver);
 
     connect(m_connection, &Connection::loginFlowsChanged, this, [=](){
-        NeochatRegisterJob *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), QStringLiteral("user123123123332333r4354556867scdxxbfgd"), QString(), QString(), QString(), false);
+        auto *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), QStringLiteral("user123123123332333r4354556867scdxxbfgd"), QString(), QString(), QString(), false);
         connect(job, &BaseJob::result, this, [=](){
             setHomeserverAvailable((job->error() == BaseJob::StatusCode::Unauthorised) || (job->error() == BaseJob::StatusCode::IncorrectRequest));
             setTesting(false);
-            qDebug() << job->rawData();
         });
     });
 }
@@ -193,7 +188,7 @@ void Registration::testUsername()
     }
     setTestingUsername(true);
     setUsernameAvailable(false);
-    CheckUsernameAvailabilityJob *job = m_connection->callApi<CheckUsernameAvailabilityJob>(m_username);
+    auto *job = m_connection->callApi<CheckUsernameAvailabilityJob>(m_username);
     connect(job, &BaseJob::result, this, [=](){
         if(job->error() == BaseJob::StatusCode::Success) {
             setUsernameAvailable(*job->available());
@@ -211,6 +206,27 @@ void Registration::setTestingUsername(bool testing)
 bool Registration::testingUsername() const
 {
     return m_testingUsername;
+}
+
+void Registration::loadFlows()
+{
+    m_flows.clear();
+    auto *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), m_username, QString(), QString(), QString(), false);
+        connect(job, &BaseJob::result, this, [=](){
+            for(const auto &flow : job->jsonData()["flows"].toArray()) {
+                QVector<QString> stages;
+                for(const auto &stage : flow.toObject()["stages"].toArray()) {
+                    stages += stage.toString();
+                }
+                m_flows += stages;
+            }
+            Q_EMIT flowsChanged();
+        });
+}
+
+QVector<QVector<QString>> Registration::flows() const
+{
+    return m_flows;
 }
 
 NeochatRegisterJob::NeochatRegisterJob(const QString& kind,
