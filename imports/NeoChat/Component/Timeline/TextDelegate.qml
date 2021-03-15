@@ -9,7 +9,7 @@ import QtQuick.Layouts 1.12
 
 import org.kde.kirigami 2.4 as Kirigami
 
-TextEdit {
+Text {
     id: contentLabel
 
     Layout.margins: Kirigami.Units.largeSpacing
@@ -44,8 +44,8 @@ a{
 
     color: Kirigami.Theme.textColor
     font.pointSize: isEmoji.test(display) ? Kirigami.Theme.defaultFont.pointSize * 4 : Kirigami.Theme.defaultFont.pointSize
-    selectByMouse: !Kirigami.Settings.isMobile
-    readOnly: true
+    //selectByMouse: !Kirigami.Settings.isMobile
+    //readOnly: true
     wrapMode: Text.WordWrap
     textFormat: Text.RichText
 
@@ -54,6 +54,7 @@ a{
     }
 
     MouseArea {
+        enabled: !Kirigami.Settings.isMobile
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
         cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.IBeamCursor

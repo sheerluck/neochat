@@ -43,6 +43,8 @@ Item {
     property int hoverComponentX: column.width - hoverComponent.childWidth + Kirigami.Units.largeSpacing
     property int hoverComponentY: -Kirigami.Units.largeSpacing - hoverComponent.childHeight * 1.5
 
+    property alias dragging: dragHandler.active
+
     // show hover actions
     onHoveredChanged: {
         if (hovered && !Kirigami.Settings.isMobile) {
@@ -64,10 +66,12 @@ Item {
     }
 
     DragHandler {
+        id: dragHandler
         enabled: Kirigami.Settings.isMobile
         yAxis.enabled: false
         xAxis.enabled: true
         xAxis.maximum: 0
+        dragThreshold: Kirigami.Units.gridUnit / 2
         xAxis.minimum: -Kirigami.Units.gridUnit * 4
         onActiveChanged: {
             applicationWindow().pageStack.interactive = true;
@@ -138,7 +142,7 @@ Item {
             }
 
             // bubble
-            QQC2.Control {
+            QQC2.ItemDelegate {
                 id: controlContainer
                 //Layout.fillWidth: true
                 Layout.maximumWidth: mainColumn.width - Kirigami.Units.gridUnit * 2 - Kirigami.Units.largeSpacing * 2

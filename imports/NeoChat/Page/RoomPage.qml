@@ -189,7 +189,7 @@ Kirigami.ScrollablePage {
         readonly property bool isLoaded: page.width * page.height > 10
 
         spacing: Kirigami.Units.smallSpacing
-        reuseItems: true
+        //reuseItems: true
 
         verticalLayoutDirection: ListView.BottomToTop
         highlightMoveDuration: 500
