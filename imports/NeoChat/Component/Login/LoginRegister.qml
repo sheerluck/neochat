@@ -30,6 +30,6 @@ LoginStep {
         Layout.alignment: Qt.AlignHCenter
         text: i18n("Register")
         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-        onClicked: processed("qrc:/imports/NeoChat/Component/Login/Captcha.qml")
+        onClicked: processed("qrc:/imports/NeoChat/Component/Login/Homeserver.qml")
     }
 }

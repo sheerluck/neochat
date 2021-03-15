@@ -26,6 +26,8 @@ Registration::Registration()
             conn->close();
         });        
     });
+
+    connect(this, &Registration::homeserverChanged, this, &Registration::testHomeserver);
 }
 
 void Registration::setRecaptchaResponse(const QString &recaptchaResponse)
@@ -111,6 +113,60 @@ QString Registration::termsName() const
 QString Registration::termsUrl() const
 {
     return m_termsUrl;
+}
+
+QString Registration::homeserver() const
+{
+    return m_homeserver;
+}
+
+void Registration::setHomeserver(const QString& url)
+{
+    m_homeserver = url;
+    Q_EMIT homeserverChanged();
+}
+
+void Registration::testHomeserver()
+{
+    setTesting(true);
+    setHomeserverAvailable(false);
+    if (m_connection) {
+        delete m_connection;
+        m_connection = nullptr;
+    }
+
+    m_connection = new Connection(this);
+    m_connection->resolveServer(QStringLiteral("@user:") + m_homeserver);
+
+    connect(m_connection, &Connection::loginFlowsChanged, this, [=](){
+        NeochatRegisterJob *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), QStringLiteral("user"), QString(), QString(), QString(), false);
+        connect(job, &BaseJob::result, this, [=](){
+            setHomeserverAvailable((job->error() == BaseJob::StatusCode::Unauthorised) || (job->error() == BaseJob::StatusCode::IncorrectRequest));
+            setTesting(false);
+        });
+    });
+}
+
+bool Registration::homeserverAvailable() const
+{
+    return m_homeserverAvailable;
+}
+
+void Registration::setHomeserverAvailable(bool available)
+{
+    m_homeserverAvailable = available;
+    Q_EMIT homeserverAvailableChanged();
+}
+
+void Registration::setTesting(bool testing)
+{
+    m_testing = testing;
+    Q_EMIT testingChanged();
+}
+
+bool Registration::testing() const
+{
+    return m_testing;
 }
 
 NeochatRegisterJob::NeochatRegisterJob(const QString& kind,

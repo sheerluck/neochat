@@ -26,13 +26,11 @@ LoginStep {
     WebView {
         id: webview
         url: "http://localhost:20847"
-        width: 320
-        height: 500
+        width: welcomePage.width
+        height: welcomePage.height
         
         onLoadingChanged: {
-            if(!loading) {
-                webview.runJavaScript("document.body.style.background = '" + Kirigami.theme.backgroundColor + "'")
-            }
+            webview.runJavaScript("document.body.style.background = '" + Kirigami.Theme.backgroundColor + "'")
         }
         
         Timer {

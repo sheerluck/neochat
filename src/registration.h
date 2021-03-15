@@ -11,6 +11,8 @@
 #include <QVector>
 #include <QJsonObject>
 
+#include <connection.h>
+
 #include <jobs/basejob.h>
 #include <util.h>
 
@@ -18,13 +20,16 @@ class Registration : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString homeserver READ homeserver WRITE setHomeserver NOTIFY homeserverChanged)
     Q_PROPERTY(QString recaptchaSiteKey READ recaptchaSiteKey WRITE setRecaptchaSiteKey NOTIFY recaptchaSiteKeyChanged)
     Q_PROPERTY(QString recaptchaResponse READ recaptchaResponse WRITE setRecaptchaResponse NOTIFY recaptchaResponseChanged)
     Q_PROPERTY(QString termsName READ termsName WRITE setTermsName NOTIFY termsNameChanged)
     Q_PROPERTY(QString termsUrl READ termsUrl WRITE setTermsUrl NOTIFY termsUrlChanged)
+    Q_PROPERTY(bool homeserverAvailable READ homeserverAvailable NOTIFY homeserverAvailableChanged)
+    Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
     
 public:
-    
+
     static Registration &instance()
     {
         static Registration _instance;
@@ -36,27 +41,48 @@ public:
 
     void setRecaptchaSiteKey(const QString &recaptchaSiteKey);
     QString recaptchaSiteKey() const;
-    
+
     void setRecaptchaResponse(const QString &response);
     QString recaptchaResponse() const;
-    
+
     void setTermsName(const QString &termsname);
     QString termsName() const;
-    
+
     void setTermsUrl(const QString &termsUrl);
     QString termsUrl() const;
+
+    void setHomeserver(const QString &url);
+    QString homeserver() const;
+
+    bool homeserverAvailable() const;
+    void setHomeserverAvailable(bool available);
+
+    bool testing() const;
+    void setTesting(bool testing);
 
 Q_SIGNALS:
     void recaptchaSiteKeyChanged();
     void recaptchaResponseChanged();
     void termsNameChanged();
     void termsUrlChanged();
+    void homeserverChanged();
+    void homeserverAvailableChanged();
+    void testingChanged();
+
 private:
     QString m_recaptchaSiteKey = "6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb";
     QString m_recaptchaResponse;
     QString m_termsName;
     QString m_termsUrl;
-    
+    QString m_homeserver;
+
+    bool m_homeserverAvailable = false;
+    bool m_testing = false;
+
+    Quotient::Connection *m_connection = nullptr;
+
+    void testHomeserver();
+
     Registration();
 };
 
