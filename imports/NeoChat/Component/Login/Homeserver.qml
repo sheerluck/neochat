@@ -28,7 +28,7 @@ LoginStep {
         text: Registration.testing ? i18n("Loading") : i18nc("@action:button", "Continue")
         enabled: Registration.homeserverAvailable && (!customHomeserver.visible || customHomeserver.acceptableInput)
         onTriggered: {
-            console.log("register todo")
+            processed("qrc:/imports/NeoChat/Component/Login/Username.qml");
         }
     }
 

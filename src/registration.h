@@ -27,7 +27,10 @@ class Registration : public QObject
     Q_PROPERTY(QString termsUrl READ termsUrl WRITE setTermsUrl NOTIFY termsUrlChanged)
     Q_PROPERTY(bool homeserverAvailable READ homeserverAvailable NOTIFY homeserverAvailableChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
-    
+    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
+    Q_PROPERTY(bool usernameAvailable READ usernameAvailable NOTIFY usernameAvailableChanged);
+    Q_PROPERTY(bool testingUsername READ testingUsername NOTIFY testingUsernameChanged);
+
 public:
 
     static Registration &instance()
@@ -37,7 +40,7 @@ public:
     }
 
     Q_INVOKABLE void registerAccount(const QString &homeserver, const QString &username, const QString &email, const QString &password);
-    Q_INVOKABLE QVector<QVector<QString>> flows(const QString &homeserver) const;
+    Q_INVOKABLE QVector<QVector<QString>> flows() const;
 
     void setRecaptchaSiteKey(const QString &recaptchaSiteKey);
     QString recaptchaSiteKey() const;
@@ -60,6 +63,15 @@ public:
     bool testing() const;
     void setTesting(bool testing);
 
+    QString username() const;
+    void setUsername(const QString &username);
+
+    void setUsernameAvailable(bool available);
+    bool usernameAvailable() const;
+
+    void setTestingUsername(bool testing);
+    bool testingUsername() const;
+
 Q_SIGNALS:
     void recaptchaSiteKeyChanged();
     void recaptchaResponseChanged();
@@ -68,6 +80,9 @@ Q_SIGNALS:
     void homeserverChanged();
     void homeserverAvailableChanged();
     void testingChanged();
+    void usernameChanged();
+    void usernameAvailableChanged();
+    void testingUsernameChanged();
 
 private:
     QString m_recaptchaSiteKey = "6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb";
@@ -75,13 +90,17 @@ private:
     QString m_termsName;
     QString m_termsUrl;
     QString m_homeserver;
+    QString m_username;
 
     bool m_homeserverAvailable = false;
     bool m_testing = false;
+    bool m_usernameAvailable = false;
+    bool m_testingUsername = false;
 
     Quotient::Connection *m_connection = nullptr;
 
     void testHomeserver();
+    void testUsername();
 
     Registration();
 };
