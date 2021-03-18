@@ -129,7 +129,7 @@ void Registration::testHomeserver()
     m_connection->resolveServer(QStringLiteral("@user:") + m_homeserver);
 
     connect(m_connection, &Connection::loginFlowsChanged, this, [=](){
-        auto *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), QStringLiteral("user123123123332333r4354556867scdxxbfgd"), QString(), QString(), QString(), false);
+        auto *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), QStringLiteral("user"), QString(), QString(), QString(), false);
         connect(job, &BaseJob::result, this, [=](){
             setHomeserverAvailable((job->error() == BaseJob::StatusCode::Unauthorised) || (job->error() == BaseJob::StatusCode::IncorrectRequest));
             setTesting(false);
@@ -210,23 +210,40 @@ bool Registration::testingUsername() const
 
 void Registration::loadFlows()
 {
-    m_flows.clear();
     auto *job = m_connection->callApi<NeochatRegisterJob>(QStringLiteral("user"), QJsonObject(), m_username, QString(), QString(), QString(), false);
-        connect(job, &BaseJob::result, this, [=](){
-            for(const auto &flow : job->jsonData()["flows"].toArray()) {
-                QVector<QString> stages;
-                for(const auto &stage : flow.toObject()["stages"].toArray()) {
-                    stages += stage.toString();
-                }
-                m_flows += stages;
+    connect(job, &BaseJob::result, this, [=](){
+        m_flows.clear();
+        for(const auto &flow : job->jsonData()["flows"].toArray()) {
+            QVector<QString> stages;
+            for(const auto &stage : flow.toObject()["stages"].toArray()) {
+                stages += stage.toString();
             }
-            Q_EMIT flowsChanged();
-        });
+            m_flows += stages;
+        }
+        Q_EMIT flowsChanged();
+        if(job->jsonData()["params"].toObject().contains(QStringLiteral("m.login.terms"))) {
+            const auto lang = QLocale::system().uiLanguages()[0].split("-")[0];
+            qDebug() << "Lang:" << lang;
+            for(const auto &policy : job->jsonData()["params"].toObject()["m.login.terms"].toObject().keys()) {
+                QVariantMap map;
+                map["version"] = job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject()["version"].toString();
+                if(job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject().contains(lang)) {
+                    map["name"] = job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject()[lang].toObject()["name"].toString();
+                    map["url"] = job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject()[lang].toObject()["url"].toString();
+                } else {
+                    map["name"] = job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject()["en"].toObject()["name"].toString();
+                    map["url"] = job->jsonData()["params"].toObject()["m.login.terms"].toObject()[policy].toObject()["en"].toObject()["url"].toString();
+                }
+                m_terms += map;
+            }
+            Q_EMIT termsChanged();
+        }
+    });
 }
 
-QVector<QVector<QString>> Registration::flows() const
+QVector<QVariantMap> Registration::terms() const
 {
-    return m_flows;
+    return m_terms;
 }
 
 NeochatRegisterJob::NeochatRegisterJob(const QString& kind,

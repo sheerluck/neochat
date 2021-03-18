@@ -10,6 +10,7 @@
 #include <QString>
 #include <QVector>
 #include <QJsonObject>
+#include <QVariantMap>
 
 #include <connection.h>
 
@@ -23,14 +24,12 @@ class Registration : public QObject
     Q_PROPERTY(QString homeserver READ homeserver WRITE setHomeserver NOTIFY homeserverChanged)
     Q_PROPERTY(QString recaptchaSiteKey READ recaptchaSiteKey WRITE setRecaptchaSiteKey NOTIFY recaptchaSiteKeyChanged)
     Q_PROPERTY(QString recaptchaResponse READ recaptchaResponse WRITE setRecaptchaResponse NOTIFY recaptchaResponseChanged)
-    Q_PROPERTY(QString termsName READ termsName WRITE setTermsName NOTIFY termsNameChanged)
-    Q_PROPERTY(QString termsUrl READ termsUrl WRITE setTermsUrl NOTIFY termsUrlChanged)
     Q_PROPERTY(bool homeserverAvailable READ homeserverAvailable NOTIFY homeserverAvailableChanged)
     Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(bool usernameAvailable READ usernameAvailable NOTIFY usernameAvailableChanged)
     Q_PROPERTY(bool testingUsername READ testingUsername NOTIFY testingUsernameChanged)
-    Q_PROPERTY(QVector<QVector<QString>> flows READ flows NOTIFY flowsChanged)
+    Q_PROPERTY(QVector<QVariantMap> terms READ terms NOTIFY termsChanged)
 
 public:
 
@@ -72,7 +71,7 @@ public:
     void setTestingUsername(bool testing);
     bool testingUsername() const;
 
-    QVector<QVector<QString>> flows() const;
+    QVector<QVariantMap> terms() const;
 
 Q_SIGNALS:
     void recaptchaSiteKeyChanged();
@@ -86,6 +85,7 @@ Q_SIGNALS:
     void usernameAvailableChanged();
     void testingUsernameChanged();
     void flowsChanged();
+    void termsChanged();
 
 private:
     QString m_recaptchaSiteKey = "6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb";
@@ -94,6 +94,7 @@ private:
     QString m_termsUrl;
     QString m_homeserver;
     QString m_username;
+    QVector<QVariantMap> m_terms;
 
     bool m_homeserverAvailable = false;
     bool m_testing = false;
