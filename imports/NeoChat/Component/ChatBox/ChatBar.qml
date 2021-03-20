@@ -322,6 +322,7 @@ ToolBar {
 
     function postMessage() {
         checkForFancyEffectsReason();
+
         if (ChatBoxHelper.hasAttachment) {
             // send attachment but don't reset the text
             roomManager.actionsHandler.postMessage("", ChatBoxHelper.attachmentPath,
@@ -330,8 +331,16 @@ ToolBar {
             messageSent();
             return;
         }
-        roomManager.actionsHandler.postMessage(inputField.text.trim(), ChatBoxHelper.attachmentPath,
-            ChatBoxHelper.replyEventId, ChatBoxHelper.editEventId, userAutocompleted);
+
+        const re = /^s\/([^\/]*)\/([^\/]*)/;
+        if (re.test(inputField.text)) {
+            // send edited messages
+            roomManager.actionsHandler.postEdit(inputField.text);
+        } else {
+            // send normal message
+            roomManager.actionsHandler.postMessage(inputField.text.trim(), ChatBoxHelper.attachmentPath,
+                ChatBoxHelper.replyEventId, ChatBoxHelper.editEventId, userAutocompleted);
+        }
         currentRoom.markAllMessagesAsRead();
         inputField.clear();
         inputField.text = Qt.binding(function() {

@@ -4,7 +4,8 @@
 
 #include "actionshandler.h"
 
-#include "csapi/joining.h"
+#include <csapi/joining.h>
+#include <events/roommessageevent.h>
 
 #include <KLocalizedString>
 #include <QStringBuilder>
@@ -155,6 +156,35 @@ void ActionsHandler::createRoom(const QString &name, const QString &topic)
     Quotient::CreateRoomJob::connect(createRoomJob, &CreateRoomJob::success, [=] {
         Q_EMIT roomJoined(createRoomJob->roomId());
     });
+}
+
+void ActionsHandler::postEdit(const QString &text)
+{
+
+    for (auto it = m_room->messageEvents().crbegin(); it != m_room->messageEvents().crend(); ++it) {
+        const auto &evt = **it;
+        if (const auto event = eventCast<const RoomMessageEvent>(&evt)) {
+            if (event->hasTextContent()) {
+                static QRegularExpression re("^s/([^/]*)/([^/]*)");
+                auto match = re.match(text);
+                if (!match.hasMatch()) {
+                    // should not happen but still make sure to send the message normally
+                    // just in case.
+                    postMessage(text, QString(), QString(), QString(), QVariantMap());
+                }
+                const QString regex = match.captured(1);
+                const QString replacement = match.captured(2);
+                QString originalString;
+                if (event->content()) {
+                    originalString = static_cast<const Quotient::EventContent::TextContent *>(event->content())->body;
+                } else {
+                    originalString = event->plainBody();
+                }
+                m_room->postHtmlMessage(text, originalString.replace(regex, replacement), event->msgtype(), "", event->id());
+                return;
+            }
+        }
+    }
 }
 
 void ActionsHandler::postMessage(const QString &text,
