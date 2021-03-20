@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPl-3.0-or-later
 
 #include "actionshandler.h"
+#include "controller.h"
 
 #include <csapi/joining.h>
 #include <events/roommessageevent.h>
@@ -161,10 +162,11 @@ void ActionsHandler::createRoom(const QString &name, const QString &topic)
 void ActionsHandler::postEdit(const QString &text)
 {
 
+    const auto localId = Controller::instance().activeConnection()->userId();
     for (auto it = m_room->messageEvents().crbegin(); it != m_room->messageEvents().crend(); ++it) {
         const auto &evt = **it;
         if (const auto event = eventCast<const RoomMessageEvent>(&evt)) {
-            if (event->hasTextContent()) {
+            if (event->senderId() == localId && event->hasTextContent()) {
                 static QRegularExpression re("^s/([^/]*)/([^/]*)");
                 auto match = re.match(text);
                 if (!match.hasMatch()) {
